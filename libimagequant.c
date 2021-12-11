@@ -978,6 +978,36 @@ LIQ_EXPORT const liq_palette *liq_get_palette(liq_result *result)
     return &result->int_palette;
 }
 
+LIQ_EXPORT liq_error liq_set_palette(liq_attr *options, liq_palette *palette, liq_result **result)
+{
+    colormap *colormap = pam_colormap(palette->count, options->malloc, options->free);
+    for(unsigned int i=0; i < palette->count; i++) {
+        colormap->palette[i].acolor.r = palette->entries[i].r;
+        colormap->palette[i].acolor.g = palette->entries[i].g;
+        colormap->palette[i].acolor.b = palette->entries[i].b;
+        colormap->palette[i].acolor.a = palette->entries[i].a;
+        colormap->palette[i].popularity = 1.0;
+    }
+
+    sort_palette(colormap, options);
+
+    *result = options->malloc(sizeof(liq_result));
+    if (!*result) return LIQ_OUT_OF_MEMORY;
+    **result = (liq_result){
+        .magic_header = liq_result_magic,
+        .malloc = options->malloc,
+        .free = options->free,
+        .palette = colormap,
+        .palette_error = 0,
+        .fast_palette = options->fast_palette,
+        .use_dither_map = options->use_dither_map,
+        .gamma = 0.45455,				// FIXME just the default
+        .min_posterization_output = options->min_posterization_output,
+    };
+    to_f_set_gamma((*result)->gamma_lut, (*result)->gamma);
+    return LIQ_OK;
+}
+
 static float remap_to_palette(liq_image *const input_image, unsigned char *const *const output_pixels, colormap *const map, const bool fast)
 {
     const int rows = input_image->height;

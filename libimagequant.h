@@ -95,6 +95,7 @@ LIQ_EXPORT liq_error liq_set_output_gamma(liq_result* res, double gamma);
 LIQ_EXPORT double liq_get_output_gamma(const liq_result *result);
 
 LIQ_EXPORT const liq_palette *liq_get_palette(liq_result *result);
+LIQ_EXPORT liq_error liq_set_palette(liq_attr *options, liq_palette *palette, liq_result **result);
 
 LIQ_EXPORT liq_error liq_write_remapped_image(liq_result *result, liq_image *input_image, void *buffer, size_t buffer_size);
 LIQ_EXPORT liq_error liq_write_remapped_image_rows(liq_result *result, liq_image *input_image, unsigned char **row_pointers);
